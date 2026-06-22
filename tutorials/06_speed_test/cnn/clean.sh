@@ -1,0 +1,1 @@
+rm -rf *.out *.exe DEBUG_* *.keras saved_model data/ *.png

@@ -1,0 +1,9 @@
+keras
+matplotlib
+pandas
+scikit-learn
+sympy
+spektral
+pydot
+# graphviz
+# svn
