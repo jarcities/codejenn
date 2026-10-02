@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 import time
 import random
 import warnings
@@ -9,7 +10,18 @@ import scipy as sp
 import pandas as pd
 import matplotlib.pyplot as plt
 import sklearn
-os.environ["KERAS_BACKEND"] = "torch"
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--backend",
+    type=str,
+    required=True,
+    choices=["tensorflow", "torch"],
+)
+args = parser.parse_args()
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["KERAS_BACKEND"] = args.backend
 import keras
 keras.config.set_floatx("float64")
 keras.config.set_dtype_policy("float64") #run on 64 bit
