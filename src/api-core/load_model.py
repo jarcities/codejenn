@@ -10,10 +10,44 @@ MAY RESULT IN CIVIL PENALTIES AND/OR CRIMINAL PENALTIES UNDER 18 U.S.C. § 641.
 
 import os
 os.environ["KERAS_BACKEND"] = "torch"
+import keras
 from keras.models import load_model
 
 
-def loadModel(file_path, base_file_name, custom_activation):
+def castModel(model, dtype, custom_objects):
+    policies = [layer.dtype_policy.name for layer in model.layers]
+    if all(policy == dtype for policy in policies if "float" in policy):
+        return model
+    try:
+        config = keras.saving.serialize_keras_object(model)
+        stack = [config]
+        while stack:
+            item = stack.pop()
+            for key, value in (
+                item.items() if isinstance(item, dict) else enumerate(item)
+            ):
+                if key == "dtype" and "float" in str(value):
+                    item[key] = dtype
+                elif isinstance(value, (dict, list)):
+                    stack.append(value)
+        cast_model = keras.saving.deserialize_keras_object(
+            config, custom_objects=custom_objects
+        )
+        cast_model.set_weights(
+            [
+                weight.astype(variable.dtype)
+                for weight, variable in zip(model.get_weights(), cast_model.weights)
+            ]
+        )
+        return cast_model
+    except Exception as e:
+        print(
+            f"\n__Warning__ Cannot cast model to {dtype}, keeping saved precision -> {e}"
+        )
+        return model
+
+
+def loadModel(file_path, base_file_name, custom_activation, dtype):
     # ==============================================================
     # load a keras model from .h5 or .keras using keras and tf with
     # combos of compile and custom objects options.
@@ -57,33 +91,36 @@ def loadModel(file_path, base_file_name, custom_activation):
 
     errors = []
 
-    # try 1
-    try:
-        model = load_model(file_path, custom_objects=custom_objects, compile=False)
-        return model, file_extension
-    except Exception as e:
-        errors.append(f"__Error__ Keras compile=False, custom_objects -> {e}")
+    with keras.device("cpu"):
+        # try 1
+        try:
+            model = load_model(file_path, custom_objects=custom_objects, compile=False)
+            return castModel(model, dtype, custom_objects), file_extension
+        except Exception as e:
+            errors.append(f"__Error__ Keras compile=False, custom_objects -> {e}")
 
-    # try 2
-    try:
-        model = load_model(file_path, compile=False)
-        return model, file_extension
-    except Exception as e:
-        errors.append(f"__Error__ Keras compile=False, no custom_objects -> {e}")
+        # try 2
+        try:
+            model = load_model(file_path, compile=False)
+            return castModel(model, dtype, custom_objects), file_extension
+        except Exception as e:
+            errors.append(f"__Error__ Keras compile=False, no custom_objects -> {e}")
 
-    # try 3
-    try:
-        model = load_model(file_path, custom_objects=custom_objects)
-        return model, file_extension
-    except Exception as e:
-        errors.append(f"__Error__ Keras default compile, custom_objects -> {e}")
+        # try 3
+        try:
+            model = load_model(file_path, custom_objects=custom_objects)
+            return castModel(model, dtype, custom_objects), file_extension
+        except Exception as e:
+            errors.append(f"__Error__ Keras default compile, custom_objects -> {e}")
 
-    # try 4
-    try:
-        model = load_model(file_path)
-        return model, file_extension
-    except Exception as e:
-        errors.append(f"__Error__ Keras default compile, no custom_objects -> {e}")
+        # try 4
+        try:
+            model = load_model(file_path)
+            return castModel(model, dtype, custom_objects), file_extension
+        except Exception as e:
+            errors.append(
+                f"__Error__ Keras default compile, no custom_objects -> {e}"
+            )
 
     # all is lost
     error_message = "\n".join(errors)

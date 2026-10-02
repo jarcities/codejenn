@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import sklearn
 os.environ["KERAS_BACKEND"] = "torch"
 import keras
+keras.config.set_floatx("float64")
+keras.config.set_dtype_policy("float64") #run on 64 bit
 
 def main():
     # mlp stuff
@@ -80,4 +82,5 @@ def main():
     model.save("model.keras")
 
 if __name__ == "__main__":
-    main()
+    with keras.device("cpu"):
+        main()

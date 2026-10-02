@@ -57,6 +57,7 @@ parser.add_argument(
     type=int,
     required=False,
     default=32,
+    choices=[32, 64],
     help="use float(32)/double(64) precision for neural net computations",
 )
 parser.add_argument(
@@ -122,6 +123,9 @@ elif args.bit == 32:
     BIT_ = np.int32
     precision_type = "float"
 
+keras.config.set_floatx(np.dtype(BIT).name)
+keras.config.set_dtype_policy(np.dtype(BIT).name)
+
 input_dir = Path(args.input)
 output_dir = Path(args.output)
 
@@ -167,7 +171,7 @@ for entry in sorted(input_dir.iterdir()):
         ###################
         try:
             model, file_extension = loadModel(
-                file_path, base_file_name, custom_activation
+                file_path, base_file_name, custom_activation, np.dtype(BIT).name
             )
         except ValueError:
             print(f'\n__Skipping__ "{file_name}" -> not a compatible file.')
@@ -195,6 +199,28 @@ for entry in sorted(input_dir.iterdir()):
             # cast weights and biases to the chosen precision
             weights_list = [w.astype(BIT) if w is not None else w for w in weights_list]
             biases_list = [b.astype(BIT) if b is not None else b for b in biases_list]
+            norm_layer_params = [
+                (
+                    tuple(
+                        p.astype(BIT) if isinstance(p, np.ndarray) else p
+                        for p in params
+                    )
+                    if params is not None
+                    else params
+                )
+                for params in norm_layer_params
+            ]
+            conv_layer_params = [
+                (
+                    {
+                        key: p.astype(BIT) if isinstance(p, np.ndarray) else p
+                        for key, p in params.items()
+                    }
+                    if params is not None
+                    else params
+                )
+                for params in conv_layer_params
+            ]
 
             # https://keras.io/api/utils/model_plotting_utils/
             if args.model_image:

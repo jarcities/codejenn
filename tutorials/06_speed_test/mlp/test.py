@@ -31,7 +31,8 @@ torch.set_num_threads(1)
 #########################################################
 
 # load model
-model = keras.models.load_model("model.keras")
+with keras.device("cpu"):
+    model = keras.models.load_model("model.keras")
 
 # load data
 batch = []
@@ -46,48 +47,49 @@ for i in range(NUM_SAMPLES):
     #########################################################################
     batch.append(tensor)
 
-# eager inference
-if not JIT_TF and not JIT_PY:
-    # warmup
-    _ = model(batch[0], training=False)
-    # time loop
-    start = time.perf_counter()
-    for i in range(NUM_SAMPLES):
-        _ = model(batch[i], training=False)
-    end = time.perf_counter()
+with keras.device("cpu"):
+    # eager inference
+    if not JIT_TF and not JIT_PY:
+        # warmup
+        _ = model(batch[0], training=False)
+        # time loop
+        start = time.perf_counter()
+        for i in range(NUM_SAMPLES):
+            _ = model(batch[i], training=False)
+        end = time.perf_counter()
 
-## UNCOMMENT FOR TENSORFLOW JIT ##
-##########################################
-# elif JIT_TF:
-#     # jit xla inference
-#     @tf.function(jit_compile=True)
-#     def run_one(x):
-#         return model(x, training=False)
+    ## UNCOMMENT FOR TENSORFLOW JIT ##
+    ##########################################
+    # elif JIT_TF:
+    #     # jit xla inference
+    #     @tf.function(jit_compile=True)
+    #     def run_one(x):
+    #         return model(x, training=False)
 
-#     # warmup compile
-#     _ = run_one(batch[0])
-#     # time loop
-#     start = time.perf_counter()
-#     for i in range(NUM_SAMPLES):
-#         _ = run_one(batch[i])
-#     end = time.perf_counter()
-##########################################
+    #     # warmup compile
+    #     _ = run_one(batch[0])
+    #     # time loop
+    #     start = time.perf_counter()
+    #     for i in range(NUM_SAMPLES):
+    #         _ = run_one(batch[i])
+    #     end = time.perf_counter()
+    ##########################################
 
-## UNCOMMENT FOR TORCH JIT ##
-##########################################
-else:
-    # jit py inference
-    model.eval()  
-    model = torch.jit.trace(model, batch[0]) 
-    # model = torch.compile(model)
+    ## UNCOMMENT FOR TORCH JIT ##
+    ##########################################
+    else:
+        # jit py inference
+        model.eval()
+        model = torch.jit.trace(model, batch[0])
+        # model = torch.compile(model)
 
-    # warmup
-    _ = model(batch[0])  
-    # time loop
-    start = time.perf_counter()
-    for i in range(NUM_SAMPLES):
-        _ = model(batch[i])  
-    end = time.perf_counter()
-##########################################
+        # warmup
+        _ = model(batch[0])
+        # time loop
+        start = time.perf_counter()
+        for i in range(NUM_SAMPLES):
+            _ = model(batch[i])
+        end = time.perf_counter()
+    ##########################################
 
 print(f"{(end - start):.6f} seconds!")

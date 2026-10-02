@@ -180,16 +180,30 @@ import keras
 from keras.models import load_model
 from keras import layers
 {activation_code}
-
-#load model
-file_name = "{file_path}"
-model = load_model(file_name)
-extractor = keras.Model(inputs=model.inputs, outputs=[layer.output for layer in model.layers])
+keras.config.set_floatx("{np_dtype}")
+keras.config.set_dtype_policy("{np_dtype}")
 {norm_code}
 #input data
 {input_code}
-#extract each layer
-layer_outputs = extractor.predict(data)
+#load model
+file_name = "{file_path}"
+with keras.device("cpu"):
+    saved_model = load_model(file_name)
+    config = keras.saving.serialize_keras_object(saved_model)
+    stack = [config]
+    while stack:
+        item = stack.pop()
+        for key, value in item.items() if isinstance(item, dict) else enumerate(item):
+            if key == "dtype" and "float" in str(value):
+                item[key] = "{np_dtype}"
+            elif isinstance(value, (dict, list)):
+                stack.append(value)
+    model = keras.saving.deserialize_keras_object(config)
+    model.set_weights([w.astype(v.dtype) for w, v in zip(saved_model.get_weights(), model.weights)])
+    extractor = keras.Model(inputs=model.inputs, outputs=[layer.output for layer in model.layers])
+
+    #extract each layer
+    layer_outputs = extractor.predict(data)
 
 print("\\nDebug printing first ~10 outputs of each layer:\\n")
 
