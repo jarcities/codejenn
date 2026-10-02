@@ -9,7 +9,6 @@ MAY RESULT IN CIVIL PENALTIES AND/OR CRIMINAL PENALTIES UNDER 18 U.S.C. § 641.
 """
 
 import os
-os.environ["KERAS_BACKEND"] = "torch"
 import keras
 from keras.models import load_model
 
@@ -72,7 +71,8 @@ def loadModel(file_path, base_file_name, custom_activation, dtype):
                 import importlib.util
 
                 module_dir = os.path.dirname(file_path)
-                module_path = os.path.join(module_dir, f"{custom_activation}.py")
+                module_path = os.path.join(
+                    module_dir, f"{custom_activation}.py")
                 if os.path.exists(module_path):
                     spec = importlib.util.spec_from_file_location(
                         custom_activation, module_path
@@ -94,24 +94,28 @@ def loadModel(file_path, base_file_name, custom_activation, dtype):
     with keras.device("cpu"):
         # try 1
         try:
-            model = load_model(file_path, custom_objects=custom_objects, compile=False)
+            model = load_model(
+                file_path, custom_objects=custom_objects, compile=False)
             return castModel(model, dtype, custom_objects), file_extension
         except Exception as e:
-            errors.append(f"__Error__ Keras compile=False, custom_objects -> {e}")
+            errors.append(
+                f"__Error__ Keras compile=False, custom_objects -> {e}")
 
         # try 2
         try:
             model = load_model(file_path, compile=False)
             return castModel(model, dtype, custom_objects), file_extension
         except Exception as e:
-            errors.append(f"__Error__ Keras compile=False, no custom_objects -> {e}")
+            errors.append(
+                f"__Error__ Keras compile=False, no custom_objects -> {e}")
 
         # try 3
         try:
             model = load_model(file_path, custom_objects=custom_objects)
             return castModel(model, dtype, custom_objects), file_extension
         except Exception as e:
-            errors.append(f"__Error__ Keras default compile, custom_objects -> {e}")
+            errors.append(
+                f"__Error__ Keras default compile, custom_objects -> {e}")
 
         # try 4
         try:

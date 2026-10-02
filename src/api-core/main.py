@@ -32,9 +32,9 @@ parser = argparse.ArgumentParser(
     description="code generate trained neural net files into a given directory."
 )
 parser.add_argument(
-    "--input", 
-    type=str, 
-    required=True, 
+    "--input",
+    type=str,
+    required=True,
     default="../dump_model/",
     help="path of folder with trained model files"
 )
@@ -171,7 +171,8 @@ for entry in sorted(input_dir.iterdir()):
         ###################
         try:
             model, file_extension = loadModel(
-                file_path, base_file_name, custom_activation, np.dtype(BIT).name
+                file_path, base_file_name, custom_activation, np.dtype(
+                    BIT).name
             )
         except ValueError:
             print(f'\n__Skipping__ "{file_name}" -> not a compatible file.')
@@ -197,8 +198,10 @@ for entry in sorted(input_dir.iterdir()):
             ) = extractModel(model, file_extension, base_file_name)
 
             # cast weights and biases to the chosen precision
-            weights_list = [w.astype(BIT) if w is not None else w for w in weights_list]
-            biases_list = [b.astype(BIT) if b is not None else b for b in biases_list]
+            weights_list = [
+                w.astype(BIT) if w is not None else w for w in weights_list]
+            biases_list = [
+                b.astype(BIT) if b is not None else b for b in biases_list]
             norm_layer_params = [
                 (
                     tuple(
@@ -343,7 +346,8 @@ for entry in sorted(input_dir.iterdir()):
         if args.debug:
 
             try:
-                cpp_test_code = cppTestCode(precision_type, base_file_name, layer_shape)
+                cpp_test_code = cppTestCode(
+                    precision_type, base_file_name, layer_shape)
             except ValueError as e:
                 print("\n__Error__ in testing.py -> ", e)
                 continue
@@ -351,7 +355,8 @@ for entry in sorted(input_dir.iterdir()):
             source_file = source_file.with_name("DEBUG_" + source_file.name)
             with open(source_file, "w") as f:
                 f.write(cpp_test_code)
-            print(f'\nSaved "{source_file}" test code in {resolved_output_dir}/')
+            print(
+                f'\nSaved "{source_file}" test code in {resolved_output_dir}/')
 
             try:
                 py_test_code = pyTestCode(
@@ -369,7 +374,8 @@ for entry in sorted(input_dir.iterdir()):
             python_file = python_file.with_name("DEBUG_" + python_file.name)
             with open(python_file, "w") as f:
                 f.write(py_test_code)
-            print(f'\nSaved "{python_file}" test code in {resolved_output_dir}/')
+            print(
+                f'\nSaved "{python_file}" test code in {resolved_output_dir}/')
 
     except ValueError as e:
         print(f"\n__Skipping__ '{entry.name}' -> {e}\n")

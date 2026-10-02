@@ -10,8 +10,6 @@ MAY RESULT IN CIVIL PENALTIES AND/OR CRIMINAL PENALTIES UNDER 18 U.S.C. § 641.
 
 import numpy as np
 import math
-import os
-os.environ["KERAS_BACKEND"] = "torch"
 import keras
 
 
