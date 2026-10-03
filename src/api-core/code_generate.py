@@ -196,10 +196,10 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                 scale, offset = norm_params
                 cpp_code += (
                     f"    // Rescale Input/Output {layer_idx}\n"
-                    f"    constexpr std::array<Scalar, {len(scale)}> scale_{layer_idx} = {{"
+                    f"    static constexpr std::array<Scalar, {len(scale)}> scale_{layer_idx} = {{"
                     + fmt_arr(scale)
                     + "};\n"
-                    f"    constexpr std::array<Scalar, {len(offset)}> offset_{layer_idx} = {{"
+                    f"    static constexpr std::array<Scalar, {len(offset)}> offset_{layer_idx} = {{"
                     + fmt_arr(offset)
                     + "};\n\n"
                 )
@@ -215,10 +215,10 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                 bflat = b.flatten()
                 cpp_code += (
                     f"    // Dense layer {layer_idx}\n"
-                    f"    constexpr std::array<Scalar, {len(wflat)}> weights_{layer_idx} = {{"
+                    f"    static constexpr std::array<Scalar, {len(wflat)}> weights_{layer_idx} = {{"
                     + fmt_arr(wflat)
                     + "};\n"
-                    f"    constexpr std::array<Scalar, {len(bflat)}> biases_{layer_idx} = {{"
+                    f"    static constexpr std::array<Scalar, {len(bflat)}> biases_{layer_idx} = {{"
                     + fmt_arr(bflat)
                     + "};\n\n"
                 )
@@ -243,28 +243,28 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                 if gamma is not None:
                     gflat = gamma.flatten()
                     cpp_code += (
-                        f"    constexpr std::array<Scalar, {len(gflat)}> gamma_{layer_idx} = {{"
+                        f"    static constexpr std::array<Scalar, {len(gflat)}> gamma_{layer_idx} = {{"
                         + fmt_arr(gflat)
                         + "};\n"
                     )
                 if beta is not None:
                     bflat = beta.flatten()
                     cpp_code += (
-                        f"    constexpr std::array<Scalar, {len(bflat)}> beta_{layer_idx} = {{"
+                        f"    static constexpr std::array<Scalar, {len(bflat)}> beta_{layer_idx} = {{"
                         + fmt_arr(bflat)
                         + "};\n"
                     )
                 if mean is not None:
                     mflat = mean.flatten()
                     cpp_code += (
-                        f"    constexpr std::array<Scalar, {len(mflat)}> mean_{layer_idx} = {{"
+                        f"    static constexpr std::array<Scalar, {len(mflat)}> mean_{layer_idx} = {{"
                         + fmt_arr(mflat)
                         + "};\n"
                     )
                 if var is not None:
                     vflat = var.flatten()
                     cpp_code += (
-                        f"    constexpr std::array<Scalar, {len(vflat)}> variance_{layer_idx} = {{"
+                        f"    static constexpr std::array<Scalar, {len(vflat)}> variance_{layer_idx} = {{"
                         + fmt_arr(vflat)
                         + "};\n"
                     )
@@ -292,7 +292,7 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                     if kernel is not None:
                         kflat = kernel.flatten()
                         cpp_code += (
-                            f"    constexpr std::array<Scalar, {len(kflat)}> convKernel_{layer_idx} = {{"
+                            f"    static constexpr std::array<Scalar, {len(kflat)}> convKernel_{layer_idx} = {{"
                             + fmt_arr(kflat)
                             + "};\n"
                         )
@@ -302,7 +302,7 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                     if bias is not None:
                         bflat = bias.flatten()
                         cpp_code += (
-                            f"    constexpr std::array<Scalar, {len(bflat)}> convBias_{layer_idx} = {{"
+                            f"    static constexpr std::array<Scalar, {len(bflat)}> convBias_{layer_idx} = {{"
                             + fmt_arr(bflat)
                             + "};\n"
                         )
@@ -312,7 +312,7 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                             if out_shape
                             else (conv_dict.get("filters") or 1)
                         )
-                        cpp_code += f"    constexpr std::array<Scalar, {size}> convBias_{layer_idx} = {{}};\n"
+                        cpp_code += f"    static constexpr std::array<Scalar, {size}> convBias_{layer_idx} = {{}};\n"
                     cpp_code += "\n"
                     continue
 
@@ -331,7 +331,7 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                     if kernel is not None:
                         kflat = kernel.flatten()
                         cpp_code += (
-                            f"    constexpr std::array<Scalar, {len(kflat)}> depthwiseKernel_{layer_idx} = {{"
+                            f"    static constexpr std::array<Scalar, {len(kflat)}> depthwiseKernel_{layer_idx} = {{"
                             + fmt_arr(kflat)
                             + "};\n"
                         )
@@ -343,7 +343,7 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                     if bias is not None:
                         bflat = bias.flatten()
                         cpp_code += (
-                            f"    constexpr std::array<Scalar, {len(bflat)}> depthwiseBias_{layer_idx} = {{"
+                            f"    static constexpr std::array<Scalar, {len(bflat)}> depthwiseBias_{layer_idx} = {{"
                             + fmt_arr(bflat)
                             + "};\n"
                         )
@@ -353,7 +353,7 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                             if out_shape
                             else (conv_dict.get("filters") or 1)
                         )
-                        cpp_code += f"    constexpr std::array<Scalar, {size}> depthwiseBias_{layer_idx} = {{}};\n"
+                        cpp_code += f"    static constexpr std::array<Scalar, {size}> depthwiseBias_{layer_idx} = {{}};\n"
                     cpp_code += "\n"
                     continue
 
@@ -365,28 +365,28 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                     if dk is not None:
                         dkflat = dk.flatten()
                         cpp_code += (
-                            f"    constexpr std::array<Scalar, {len(dkflat)}> sepDepthwise_{layer_idx} = {{"
+                            f"    static constexpr std::array<Scalar, {len(dkflat)}> sepDepthwise_{layer_idx} = {{"
                             + fmt_arr(dkflat)
                             + "};\n"
                         )
                     if db is not None:
                         dbflat = db.flatten()
                         cpp_code += (
-                            f"    constexpr std::array<Scalar, {len(dbflat)}> sepDepthwiseBias_{layer_idx} = {{"
+                            f"    static constexpr std::array<Scalar, {len(dbflat)}> sepDepthwiseBias_{layer_idx} = {{"
                             + fmt_arr(dbflat)
                             + "};\n"
                         )
                     if pk is not None:
                         pkflat = pk.flatten()
                         cpp_code += (
-                            f"    constexpr std::array<Scalar, {len(pkflat)}> sepPointwise_{layer_idx} = {{"
+                            f"    static constexpr std::array<Scalar, {len(pkflat)}> sepPointwise_{layer_idx} = {{"
                             + fmt_arr(pkflat)
                             + "};\n"
                         )
                     if pb is not None:
                         pbflat = pb.flatten()
                         cpp_code += (
-                            f"    constexpr std::array<Scalar, {len(pbflat)}> sepPointwiseBias_{layer_idx} = {{"
+                            f"    static constexpr std::array<Scalar, {len(pbflat)}> sepPointwiseBias_{layer_idx} = {{"
                             + fmt_arr(pbflat)
                             + "};\n"
                         )
@@ -403,14 +403,14 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                     if kernel is not None:
                         kflat = kernel.flatten()
                         cpp_code += (
-                            f"    constexpr std::array<Scalar, {len(kflat)}> convKernel_{layer_idx} = {{"
+                            f"    static constexpr std::array<Scalar, {len(kflat)}> convKernel_{layer_idx} = {{"
                             + fmt_arr(kflat)
                             + "};\n"
                         )
                     if bias is not None:
                         bflat = bias.flatten()
                         cpp_code += (
-                            f"    constexpr std::array<Scalar, {len(bflat)}> convBias_{layer_idx} = {{"
+                            f"    static constexpr std::array<Scalar, {len(bflat)}> convBias_{layer_idx} = {{"
                             + fmt_arr(bflat)
                             + "};\n"
                         )
@@ -521,10 +521,10 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                 else input_shift
             )
             cpp_code += (
-                f"    constexpr std::array<Scalar, {len(input_scale)}> input_scale = {{"
+                f"    static constexpr std::array<Scalar, {len(input_scale)}> input_scale = {{"
                 + fmt_arr(float(x) for x in input_scale)
                 + "};\n\n"
-                f"    constexpr std::array<Scalar, {len(input_shift)}> input_shift = {{"
+                f"    static constexpr std::array<Scalar, {len(input_shift)}> input_shift = {{"
                 + fmt_arr(float(x) for x in input_shift)
                 + "};\n\n"
             )
@@ -547,10 +547,10 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
                 else output_shift
             )
             cpp_code += (
-                f"    constexpr std::array<Scalar, {len(output_scale)}> output_scale = {{"
+                f"    static constexpr std::array<Scalar, {len(output_scale)}> output_scale = {{"
                 + fmt_arr(float(x) for x in output_scale)
                 + "};\n\n"
-                f"    constexpr std::array<Scalar, {len(output_shift)}> output_shift = {{"
+                f"    static constexpr std::array<Scalar, {len(output_shift)}> output_shift = {{"
                 + fmt_arr(float(x) for x in output_shift)
                 + "};\n\n"
                 "\n/*\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//*/ \n\n"
@@ -1825,60 +1825,39 @@ inline auto {name_space}(const {input_type}& initial_input) {{\n
     out_size = last_shape
 
     if isinstance(out_size, tuple):
-        dims = len(out_size)
-        if dims == 1:
-            if output_scale is not None:
-                cpp_code += (
-                    f"    static std::array<Scalar, {out_size[0]}> model_output;\n\n"
-                    f"    for (int i = 0; i < {out_size[0]}; i++) {{ model_output[i] = ({last_layer}[i] * output_scale[i]) + output_shift[i]; }}\n\n"
-                )
-            else:
-                cpp_code += f"    static std::array<Scalar, {out_size[0]}> model_output = {last_layer};\n\n"
-        elif dims == 2:
-            cpp_code += f"    static std::array<std::array<Scalar, {out_size[1]}>, {out_size[0]}> model_output;\n\n"
-            if output_scale is not None:
-                cpp_code += (
-                    f"    for(int i = 0; i < {out_size[0]}; i++) {{\n"
-                    f"        for(int j = 0; j < {out_size[1]}; j++) {{\n"
-                    f"            int flatIdx = i * {out_size[1]} + j;\n"
-                    f"            model_output[i][j] = ({last_layer}[flatIdx] * output_scale[flatIdx]) + output_shift[flatIdx];\n"
-                    "        }\n    }\n\n"
-                )
-            else:
-                cpp_code += (
-                    f"    for(int i = 0; i < {out_size[0]}; i++) {{\n"
-                    f"        for(int j = 0; j < {out_size[1]}; j++) {{\n"
-                    f"            model_output[i][j] = {last_layer}[i * {out_size[1]} + j];\n"
-                    "        }\n    }\n\n"
-                )
-        elif dims == 3:
-            cpp_code += f"    static std::array<std::array<std::array<Scalar, {out_size[2]}>, {out_size[1]}>, {out_size[0]}> model_output;\n\n"
-            if output_scale is not None:
-                cpp_code += (
-                    f"    for(int i = 0; i < {out_size[0]}; i++) {{\n"
-                    f"        for(int j = 0; j < {out_size[1]}; j++) {{\n"
-                    f"            for(int k = 0; k < {out_size[2]}; k++) {{\n"
-                    f"                int flatIdx = i * {out_size[1] * out_size[2]} + j * {out_size[2]} + k;\n"
-                    f"                model_output[i][j][k] = ({last_layer}[flatIdx] * output_scale[flatIdx]) + output_shift[flatIdx];\n"
-                    "            }\n        }\n    }\n\n"
-                )
-            else:
-                cpp_code += (
-                    f"    for(int i = 0; i < {out_size[0]}; i++) {{\n"
-                    f"        for(int j = 0; j < {out_size[1]}; j++) {{\n"
-                    f"            for(int k = 0; k < {out_size[2]}; k++) {{\n"
-                    f"                model_output[i][j][k] = {last_layer}[i * {out_size[1] * out_size[2]} + j * {out_size[2]} + k];\n"
-                    "            }\n        }\n    }\n\n"
-                )
+        out_dims = out_size
+    elif output_scale is not None:
+        out_dims = (out_norm_size,)
     else:
-        if output_scale is not None:
-            cpp_code += (
-                f"    static std::array<Scalar, {out_norm_size}> model_output;\n\n"
-                f"    for (int i = 0; i < {out_norm_size}; i++) {{ model_output[i] = ({last_layer}[i] * output_scale[i]) + output_shift[i]; }}\n\n"
-            )
-        else:
-            cpp_code += f"    static std::array<Scalar, {out_size}> model_output = {last_layer};\n\n"
+        out_dims = (out_size,)
 
-    cpp_code += "    return model_output;\n\n}"
+    output_type = "Scalar"
+    for d in reversed(out_dims):
+        output_type = f"std::array<{output_type}, {d}>"
+    cpp_code += f"    static {output_type} model_output;\n\n"
+
+    loop_vars = [f"i{n}" for n in range(len(out_dims))]
+    index_terms = []
+    for n, loop_var in enumerate(loop_vars):
+        stride = get_flat_size(tuple(out_dims[n + 1 :]))
+        index_terms.append(loop_var if stride == 1 else f"{loop_var} * {stride}")
+        cpp_code += (
+            "    " * (n + 1)
+            + f"for (int {loop_var} = 0; {loop_var} < {out_dims[n]}; {loop_var}++) {{\n"
+        )
+
+    indent = "    " * (len(out_dims) + 1)
+    output_value = f"{last_layer}[flatIdx]"
+    if output_scale is not None:
+        output_value = f"({output_value} * output_scale[flatIdx]) + output_shift[flatIdx]"
+    cpp_code += (
+        f"{indent}int flatIdx = {' + '.join(index_terms)};\n"
+        f"{indent}model_output{''.join(f'[{v}]' for v in loop_vars)} = {output_value};\n"
+    )
+
+    for n in range(len(out_dims), 0, -1):
+        cpp_code += "    " * n + "}\n"
+
+    cpp_code += "\n    return model_output;\n\n}"
 
     return cpp_code

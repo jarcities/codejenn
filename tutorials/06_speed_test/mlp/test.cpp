@@ -11,13 +11,23 @@
 #include "model.hpp"
 #include "H5Cpp.h"
 
+#ifndef BIT
+#define BIT 32
+#endif
+
+#if BIT == 64
+using Scalar = double;
+#else
+using Scalar = float;
+#endif
+
 static constexpr int NUM_SAMPLES = 10000;
 static constexpr int INPUT_DIM = 1000;
 
 int main()
 {
     // load inputs
-    std::vector<std::array<double, INPUT_DIM>> batch;
+    std::vector<std::array<Scalar, INPUT_DIM>> batch;
     batch.reserve(NUM_SAMPLES);
 
     try
@@ -44,8 +54,8 @@ int main()
                 throw std::runtime_error(std::string("Dataset x wrong length: ") + path);
             }
 
-            std::array<double, INPUT_DIM> x{};
-            ds.read(x.data(), H5::PredType::NATIVE_DOUBLE);
+            std::array<Scalar, INPUT_DIM> x{};
+            ds.read(x.data(), BIT == 64 ? H5::PredType::NATIVE_DOUBLE : H5::PredType::NATIVE_FLOAT);
             batch.push_back(x);
         }
     }

@@ -22,13 +22,18 @@ template<typename Scalar, int output_size, typename ActFun>
 inline void Dense_{base_file_name}(Scalar* __restrict outputs, const Scalar* __restrict inputs, const Scalar * __restrict weights, const Scalar * __restrict biases, int input_size, ActFun activation_function, Scalar alpha) noexcept 
 {{
     for(int i = 0; i < output_size; ++i){{
-        Scalar sum = 0;
-        
-        for(int j = 0; j < input_size; ++j){{
-            sum += inputs[j] * weights[j * output_size + i];
+        outputs[i] = 0;
+    }}
+    for(int j = 0; j < input_size; ++j){{
+        const Scalar input = inputs[j];
+        const Scalar * __restrict row = weights + j * output_size;
+
+        for(int i = 0; i < output_size; ++i){{
+            outputs[i] += input * row[i];
         }}
-        sum += biases[i];
-        activation_function(outputs[i], sum, alpha);
+    }}
+    for(int i = 0; i < output_size; ++i){{
+        activation_function(outputs[i], outputs[i] + biases[i], alpha);
     }}
 }}
 """

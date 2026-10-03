@@ -18,13 +18,20 @@ parser.add_argument(
     required=True,
     choices=["tensorflow", "torch"],
 )
+parser.add_argument(
+    "--bit",
+    type=int,
+    required=False,
+    default=32,
+    choices=[32, 64],
+)
 args = parser.parse_args()
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 os.environ["KERAS_BACKEND"] = args.backend
 import keras
-keras.config.set_floatx("float64")
-keras.config.set_dtype_policy("float64") #run on 64 bit
+keras.config.set_floatx(f"float{args.bit}")
+keras.config.set_dtype_policy(f"float{args.bit}")
 
 def main():
     # mlp stuff
@@ -35,7 +42,7 @@ def main():
     LR = 1e-4
     EPOCHS = 25
     BS = 64
-    BIT = np.float64
+    BIT = np.float64 if args.bit == 64 else np.float32
 
     # seed stuff
     SEED = 1

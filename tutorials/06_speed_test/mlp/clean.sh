@@ -1,1 +1,1 @@
-rm -rf *.out *.exe *.hpp DEBUG_* *.keras saved_model data/ *.png
+rm -rf *.out *.exe *.hpp DEBUG_* *.keras saved_model data/ *.png *.csv
