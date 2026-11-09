@@ -134,5 +134,6 @@ Arcities, J., Popov, P. P., Ching, E. J., Viswanath, K., & Johnson, R. F. (2026)
   doi = {10.1016/j.softx.2026.103203},
   author = {Arcities, Jay and Popov, Pavel P. and Ching, Eric J. and Viswanath, Kamal and Johnson, Ryan F.}
 }
+```
 
 The table listing out the complete software and hardware configuration for both the benchmark test cases and the CFD neural network implementation reported in the paper cited above, can be found in `tutorials/06_benchmark_test/readme.md`.
