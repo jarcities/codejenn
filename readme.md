@@ -121,8 +121,18 @@ CodeJeNN/
 
 ## Citation
 
+Arcities, J., Popov, P. P., Ching, E. J., Viswanath, K., & Johnson, R. F. (2026). CodeJeNN: A simple C++ neural network generator for physics applications. *SoftwareX*, 36, 103203. https://doi.org/10.1016/j.softx.2026.103203
+
 ```bibtex
-# WILL ADD SOON
-```
+@article{ARCITIES2026103203,
+  title = {CodeJeNN: A simple C++ neural network generator for physics applications},
+  journal = {SoftwareX},
+  volume = {36},
+  pages = {103203},
+  year = {2026},
+  issn = {2352-7110},
+  doi = {10.1016/j.softx.2026.103203},
+  author = {Arcities, Jay and Popov, Pavel P. and Ching, Eric J. and Viswanath, Kamal and Johnson, Ryan F.}
+}
 
 The table listing out the complete software and hardware configuration for both the benchmark test cases and the CFD neural network implementation reported in the paper cited above, can be found in `tutorials/06_benchmark_test/readme.md`.
